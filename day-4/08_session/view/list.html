@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Document</title>
+	<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<style>
+		.hide {
+			display: none;
+		}
+
+		li {
+			list-style: none;
+			margin: 10px 5px;
+		}
+	</style>
+</head>
+
+<body>
+	<span id="timeId">{{timeId}}</span>
+	<ul>
+		{{each msgArr}}
+		<li><span> {{$value.userName}} </span>: <span> {{$value.msg}} </span></li>
+		{{/each}}
+	</ul>
+	<div><span>{{userName}}</span>，你好，请你说话。</div>
+	<span class="add">1</span>
+	<div>
+		<input type="text" name="msg" id="msg" />
+		<button id="sendBtn">发送</button>
+	</div>
+
+	<script>
+		$(() => {
+			let num = 1
+			$(".add").click(() => {
+				num++
+				$(".add").html(num)
+			})
+			let id = $("#timeId").html()
+			var socket = io('http://localhost:3111')
+
+			socket.on('connect', () => {
+				console.log('连接上了')
+				socket.emit('login', {
+					id,
+				})
+			})
+
+			// 登录
+			socket.on("login", (data) => {
+				$('ul').html($('ul').html() + '<li><span>' + data.msg + '</span></li>')
+			})
+
+
+			// 接收信息
+			socket.on("receiveMsg", (data) => {
+				$('ul').html($('ul').html() + '<li><span>' + data.userName + '</span>: <span>' + data.msg +
+					'</span></li>')
+			})
+
+			// 下线
+			socket.on("downLine", (data) => {
+				$('ul').html($('ul').html() + '<li><span>' + data.msg + '</span></li>')
+			})
+
+			// 发送信息
+			$("#sendBtn").click(() => {
+				let msg = $("#msg").val()
+				if (msg) {
+					socket.emit('sendMsg', {
+						id,
+						msg
+					})
+				}
+
+			})
+		})
+	</script>
+</body>
+
+</html>

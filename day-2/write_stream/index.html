@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>获取服务器流的数据</title>
+
+</head>
+
+<body>
+	<button id="btn">获取数据</button>
+	如下：<span></span>
+
+	<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script>
+		$(() => {
+			$("#btn").on("click", () => {
+				$.ajax({
+					url: "/test",
+					type: "GET",
+					success(data) {
+						$("span").html(data)
+					},
+					error(xhr, status, error) {
+						console.log(xhr);
+						console.log(status);
+						console.log(error);
+					}
+
+					// var xhr = new XMLHttpRequest();
+					//   xhr.open('get','/test');
+					//   xhr.send();
+					//   // 处理响应
+					//   xhr.onreadystatechange = function () {
+					//     // readyState = 3 的时候是响应中
+					//     console.log(xhr.readyState); //1,2,3,4
+					//     console.log(xhr.responseText);
+					//     var arr = xhr.responseText.split('^_^')
+					//     console.log(arr[arr.length-2]);
+					//     info.innerText = arr[arr.length-2];
+					//   }
+				})
+			})
+		})
+	</script>
+</body>
+
+</html>

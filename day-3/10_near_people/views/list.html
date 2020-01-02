@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>查找附近的人</title>
+	<style>
+		span {
+			margin: 0px 20px;
+		}
+
+		img {
+			width: 75px;
+			height: 75px;
+			border-radius: 50%;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+	<h4>你附近的人如下：</h4>
+	<ul>
+		{{each nearList}}
+		<li>
+			<span>{{$value.userName}}</span>
+			<img src={{$value.fileUrl}} alt="">
+			<span>{{$value.fileName}}</span>
+			<span>距离：{{$value.dis}}米</span>
+		</li>
+		{{/each}}
+
+		</! </body> </html>

@@ -1,0 +1,22 @@
+{
+  "name": "code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "art-template": "^4.13.2",
+    "koa-art-template": "^1.1.1",
+    "koa-parser": "^1.0.8",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.12.3",
+    "koa-socket": "^4.4.0",
+    "koa-static": "^5.0.0",
+    "koa-views": "^6.2.1",
+    "mysql": "^2.17.1"
+  }
+}

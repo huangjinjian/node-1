@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Document</title>
+	<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<style>
+		.hide {
+			display: none;
+		}
+
+		li {
+			list-style: none;
+			margin: 10px 5px;
+		}
+
+		#online-ul li {
+			padding: 5px 10px;
+		}
+
+		.wrap {
+			width: 100%;
+			display: flex;
+		}
+
+		.wrap div {
+			flex: 1;
+		}
+	</style>
+</head>
+
+<body>
+	<span id="timeId" class="hide">{{timeId}}</span>
+	<div>
+		当前在线人数：<span id="onlineNum"></span> 人。
+	</div>
+	<div class="wrap">
+		<div>
+			<h3>在线列表:</h3>
+			<ul id="online-ul">
+			</ul>
+		</div>
+		<div>
+			<h3>群组:</h3>
+			<ul id="group-ul">
+				<li>男生组 群聊 <button type='man'>加入</button></li>
+				<li>女士组 群聊 <button type="women">加入</button></li>
+			</ul>
+			<h3>群聊</h3>
+			<ul id="my-group-ul">
+				<!-- <li type='man'>男生组 群聊</li>
+				<li type="women">女士组 群聊</li> -->
+			</ul>
+			<!-- <div><span id="type"></span></div> -->
+			<input type="text" id="groupMsg">
+			<button id="groupBtn">发送群聊(默认发男生组)</button>
+		</div>
+	</div>
+
+	<br>
+	<div>
+		<h3>聊天内容</h3>
+		<ul id="chat-ui">
+
+		</ul>
+	</div>
+	<div><span>{{userName}}</span>，你好，请你说话。</div>
+	<div>
+		群聊:<input type="text" name="msg" id="msg" />
+		<button id="sendBtn">发送</button>
+	</div>
+	<div>
+		私聊:<span id="privateUser"></span> <input type="text" name="privateMsg" id="privateMsg" />
+		<button id="sendPrivateBtn">发送私聊</button>
+	</div>
+	<script>
+		$(() => {
+
+			let id = $("#timeId").html()
+			var socket = io('http://localhost:3111')
+			socket.on('connect', () => {
+				socket.emit('login', {
+					id,
+				})
+			})
+
+			// 更新在线人数
+			socket.on("updateOnline", (data) => {
+				let selfItem = data.Online[id]
+				let onlineArr = Object.values(data.Online)
+				$("#onlineNum").html(onlineArr.length)
+				updateOnlineList(onlineArr)
+			})
+
+			function updateOnlineList(onlineArr) {
+				let str = '';
+				onlineArr.forEach(item => {
+					str += `<li privateId='${item.socketId}' id='${item.socketId}'>
+							${item.userName}
+						</li>`
+				})
+				$("#online-ul").html(str)
+			}
+
+
+			// 登录
+			socket.on("login", (data) => {
+				$('#chat-ui').html($('#chat-ui').html() + '<li><span>' + data.msg + '</span></li>')
+			})
+
+
+			// 接收信息
+			socket.on("receiveMsg", (data) => {
+				$('#chat-ui').html($('#chat-ui').html() + '<li><span>' + data.userName + '</span>: <span>' + data.msg +
+					'</span></li>')
+			})
+
+			// 下线
+			socket.on("downLine", (data) => {
+				$('#chat-ui').html($('#chat-ui').html() + '<li><span>' + data.msg + '</span></li>')
+			})
+
+			// 接收私聊信息
+			socket.on('acceptPrivate', (data) => {
+				$('#chat-ui').html($('#chat-ui').html() + '<li><span>用户:' + data.userName + '发来私聊</span>: <span>' + data
+					.msg +
+					'</span></li>')
+			})
+
+			// 加入群聊
+			socket.on('groupMsg', (data) => {
+				$('#my-group-ul').html($('#my-group-ul').html() + '<li>群组：' + data.type + '。' + data.msg + '</li>')
+			})
+
+			// 发送信息
+			$("#sendBtn").click(() => {
+				let msg = $("#msg").val()
+				if (msg) {
+					socket.emit('sendMsg', {
+						id,
+						msg
+					})
+				}
+			})
+
+			// 选着私聊的对象
+			let privateSocketId = '';
+			$('#online-ul').on("click", "li", function () {
+				privateSocketId = $(this).attr('id')
+				$("#privateUser").html($(this).html())
+			})
+
+			// 私聊信息
+			$("#sendPrivateBtn").click(() => {
+				socket.emit('privateMsg', {
+					privateSocketId,
+					msg: $('#privateMsg').val()
+				})
+			})
+
+			// 加入群聊
+			$("#group-ul").find('button').click(function () {
+				socket.emit('addGroup', {
+					type: $(this).attr('type')
+				})
+			})
+
+			// 发送群聊
+			$('#groupBtn').click(() => {
+				socket.emit('groupMsg', {
+					type: 'man',
+					msg: $('#groupMsg').val()
+				})
+			})
+		})
+	</script>
+</body>
+
+</html>

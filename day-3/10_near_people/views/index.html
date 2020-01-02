@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>上传文件</title>
+	<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+	<style>
+		.wrap {
+			width: 450px;
+			margin: 150px auto;
+		}
+
+		img {
+			width: 75px;
+			height: 75px;
+		}
+
+		span,
+		img {
+			margin-right: 24px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="wrap">
+		<div>姓名：<input type="text" name="userName" id="userName" /></div>
+		<br>
+		<div>
+			<input type="file" name="photo" id="upfile" />
+		</div>
+		<br>
+		<label for="lng">经度</label> <input type="text" name="lng" id="lng">
+		<label for="lat">纬度</label> <input type="text" name="lat" id="lat">
+		<br>
+		<br>
+		<button id="btn">提交</button>
+		<br>
+		<br>
+	</div>
+
+	<script>
+		$('#btn').click(function () {
+			var formData = new FormData()
+			formData.append('pic', document.getElementById('upfile').files[0])
+			formData.append('userName', document.getElementById('userName').value)
+			formData.append('lng', document.getElementById('lng').value)
+			formData.append('lat', document.getElementById('lat').value)
+			console.log(formData)
+			$.ajax({
+				type: 'POST', // 数据提交类型
+				url: '/api', // 发送地址
+				data: formData, //发送数据
+				async: true, // 是否异步
+				processData: false, //processData 默认为false，当设置为true的时候,jquery ajax 提交的时候不会序列化 data，而是直接使用data
+				contentType: false, //
+				success: function (data) {
+					console.log(data);
+					if (data.ok == 1) {
+						window.location.replace("http://localhost:6261/list")
+					}
+				}
+			})
+		})
+	</script>
+</body>
+
+</html>
